@@ -6,11 +6,16 @@ import Table from '../ui/Table';
 import HomeIcon from '../ui/icons/HomeIcon';
 import { useCountingunits, useDeleteCountingunit } from '../../hooks/useCountingunits';
 import { ConfirmModal } from '../ui/Modal';
+import { SuccessModal } from '../ui/SuccessModal';
+import ErrorModal from '../ui/ErrorModal';
 
 const CountingunitsManagement: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedCountingUnit, setSelectedCountingUnit] = useState<any>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorData, setErrorData] = useState<any>(null);
   
   const { data: countingUnits = [], isLoading, error, refetch } = useCountingunits();
   const deleteCountingunitMutation = useDeleteCountingunit();
@@ -41,12 +46,19 @@ const CountingunitsManagement: React.FC = () => {
     
     try {
       await deleteCountingunitMutation.mutateAsync(selectedCountingUnit.CountingUnitID);
-      alert('واحد شمارشی با موفقیت حذف شد');
       setDeleteModalOpen(false);
       setSelectedCountingUnit(null);
+      setShowSuccessModal(true);
       refetch();
     } catch (error: any) {
-      alert('خطا در حذف واحد شمارشی');
+      setDeleteModalOpen(false);
+      setSelectedCountingUnit(null);
+      if (error?.response?.data) {
+        setErrorData(error.response.data);
+        setShowErrorModal(true);
+      } else {
+        alert('خطا در حذف واحد شمارشی');
+      }
     }
   };
 
@@ -178,6 +190,19 @@ const CountingunitsManagement: React.FC = () => {
         cancelText="انصراف"
         confirmButtonColor="red"
         isLoading={deleteCountingunitMutation.isPending}
+      />
+
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="عملیات موفق"
+        message="واحد شمارشی با موفقیت حذف شد"
+      />
+
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        error={errorData}
       />
     </div>
   );
