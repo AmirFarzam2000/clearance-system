@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { tarrifsApi } from '../../api/tarrifs';
+import { useToast } from '../../hooks/useToast';
+import ToastContainer from './Toast';
 
 interface TariffL2ModalProps {
   isOpen: boolean;
@@ -28,6 +30,7 @@ const TariffL2Modal: React.FC<TariffL2ModalProps> = ({
   parentTarrifL1 
 }) => {
   const queryClient = useQueryClient();
+  const { toasts, removeToast, showSuccess, showError } = useToast();
   
   const {
     register,
@@ -47,6 +50,9 @@ const TariffL2Modal: React.FC<TariffL2ModalProps> = ({
 
   const createTariffL2Mutation = useMutation({
     mutationFn: async (data: TariffL2FormData) => {
+      console.log('Creating Tariff L2 with parent:', parentTarrifL1);
+      console.log('Parent ID:', parentTarrifL1?.id);
+      
       const tariffL2Data = {
         ParentID: parentTarrifL1?.id || 0,
         WithParentNo: data.tariffNumber,
@@ -57,16 +63,44 @@ const TariffL2Modal: React.FC<TariffL2ModalProps> = ({
         isVisible: data.displayStatus
       };
       
+      console.log('Sending payload:', tariffL2Data);
+      
       return await tarrifsApi.createL2(tariffL2Data);
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tarrifL2s'] });
       queryClient.invalidateQueries({ queryKey: ['tarrifs'] });
+      queryClient.invalidateQueries({ queryKey: ['tarrifL1s'] });
+      showSuccess('موفقیت', 'تعرفه سطح 2 با موفقیت ثبت شد');
       onSubmit(variables);
       handleClose();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error creating tariff L2:', error);
+      
+      // Handle errors with toast notifications
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        
+        if (errorData.ActionErrors && errorData.ActionErrors.length > 0) {
+          errorData.ActionErrors.forEach((errorMsg: string) => {
+            showError('خطا در ثبت تعرفه سطح 2', errorMsg);
+          });
+        } else if (errorData.ValidationErrors && errorData.ValidationErrors.length > 0) {
+          errorData.ValidationErrors.forEach((validationError: any) => {
+            const errorMessage = validationError.ErrorMessage || validationError.message || 'خطا در اعتبارسنجی';
+            showError('خطا در اعتبارسنجی', errorMessage);
+          });
+        } else if (errorData.message) {
+          showError('خطا در ثبت تعرفه سطح 2', errorData.message);
+        } else {
+          showError('خطا در ثبت تعرفه سطح 2', 'خطای غیرمنتظره‌ای رخ داده است');
+        }
+      } else if (error.message) {
+        showError('خطا در ثبت تعرفه سطح 2', error.message);
+      } else {
+        showError('خطا در ثبت تعرفه سطح 2', 'خطای غیرمنتظره‌ای رخ داده است');
+      }
     }
   });
 
@@ -124,7 +158,8 @@ const TariffL2Modal: React.FC<TariffL2ModalProps> = ({
                 </label>
                 <input
                   {...register('tariffNumber', { required: 'شماره تعرفه الزامی است' })}
-                  type="text"
+                  type="number"
+                  inputMode="numeric"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-yekan text-sm"
                   dir="ltr"
                   placeholder="شماره تعرفه را وارد کنید"
@@ -222,6 +257,7 @@ const TariffL2Modal: React.FC<TariffL2ModalProps> = ({
           </motion.div>
         </motion.div>
       )}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </AnimatePresence>
   );
 };
