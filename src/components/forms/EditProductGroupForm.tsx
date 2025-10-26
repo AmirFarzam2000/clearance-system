@@ -44,15 +44,20 @@ const EditProductGroupForm: React.FC = () => {
   }));
 
   useEffect(() => {
-    if (productGroup) {
+    if (productGroup && productGroupLevels.length > 0) {
+      // Find the level title based on ProductGroupLevelID
+      const selectedLevel = productGroupLevels.find((level: any) => 
+        level.ProductGroupLevelID === productGroup.ProductGroupLevelID
+      );
+      
       setFormData({
-        category: productGroup.ProductGroupLevelTitle || '',
+        category: selectedLevel?.ProductGroupLevelID?.toString() || '',
         title: productGroup.Title || '',
         code: productGroup.Code || '',
         description: productGroup.Description || ''
       });
     }
-  }, [productGroup]);
+  }, [productGroup, productGroupLevels]);
 
   const handleInputChange = (field: keyof ProductGroupFormData, value: string) => {
     setFormData(prev => ({
@@ -68,18 +73,15 @@ const EditProductGroupForm: React.FC = () => {
     setIsLoading(true);
     
     try {
-      const levelMap: { [key: string]: number } = {
-        'نوع کالا': 1,
-        'مارک کالا': 2,
-        'مدل کالا': 3,
-        'دستگاه / کالا': 4,
-        'نوع قطعات': 5
-      };
+      // Find the selected level based on the category ID
+      const selectedLevel = productGroupLevels.find((level: any) => 
+        level.ProductGroupLevelID?.toString() === formData.category
+      );
 
       const payload: Productgroup = {
         ...productGroup,
-        ProductGroupLevelID: levelMap[formData.category] || productGroup.ProductGroupLevelID,
-        ProductGroupLevelTitle: formData.category,
+        ProductGroupLevelID: selectedLevel?.ProductGroupLevelID || productGroup.ProductGroupLevelID,
+        ProductGroupLevelTitle: selectedLevel?.Title || '',
         Code: formData.code,
         Title: formData.title,
         Description: formData.description || ''
