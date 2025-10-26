@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { tarrifsApi } from '../../api/tarrifs';
+import { useToast } from '../../hooks/useToast';
+import ToastContainer from './Toast';
 
 interface TariffModalProps {
   isOpen: boolean;
@@ -12,7 +14,7 @@ interface TariffModalProps {
 }
 
 interface TariffFormData {
-  tariffNumber: number;
+  tariffNumber: string;
   productType: string;
   preferentialCountryCode: string;
   remarks: string;
@@ -22,6 +24,7 @@ interface TariffFormData {
 
 const TariffModal: React.FC<TariffModalProps> = ({ isOpen, onClose, onSubmit }) => {
   const queryClient = useQueryClient();
+  const { toasts, removeToast, showSuccess, showError } = useToast();
   
   const {
     register,
@@ -30,7 +33,7 @@ const TariffModal: React.FC<TariffModalProps> = ({ isOpen, onClose, onSubmit }) 
     reset
   } = useForm<TariffFormData>({
     defaultValues: {
-      tariffNumber: undefined,
+      tariffNumber: '',
       productType: '',
       preferentialCountryCode: '',
       remarks: '',
@@ -41,8 +44,11 @@ const TariffModal: React.FC<TariffModalProps> = ({ isOpen, onClose, onSubmit }) 
 
   const createTariffMutation = useMutation({
     mutationFn: async (data: TariffFormData) => {
+      // Convert string to number, but keep it as string in the payload if needed by API
+      const tarrifNo = data.tariffNumber ? data.tariffNumber : '';
+      
       const tariffData = {
-        TarrifNo: data.tariffNumber,
+        TarrifNo: tarrifNo ? Number(tarrifNo) : 0,
         ProductType: data.productType,
         PreferentialTarrifCountryCode: data.preferentialCountryCode,
         Remark: data.remarks,
@@ -54,11 +60,37 @@ const TariffModal: React.FC<TariffModalProps> = ({ isOpen, onClose, onSubmit }) 
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['tarrifs'] });
+      queryClient.invalidateQueries({ queryKey: ['tarrifL1s'] });
+      showSuccess('موفقیت', 'تعرفه سطح 1 با موفقیت ثبت شد');
       onSubmit(variables);
       handleClose();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Error creating tariff:', error);
+      
+      // Handle errors with toast notifications
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        
+        if (errorData.ActionErrors && errorData.ActionErrors.length > 0) {
+          errorData.ActionErrors.forEach((errorMsg: string) => {
+            showError('خطا در ثبت تعرفه سطح 1', errorMsg);
+          });
+        } else if (errorData.ValidationErrors && errorData.ValidationErrors.length > 0) {
+          errorData.ValidationErrors.forEach((validationError: any) => {
+            const errorMessage = validationError.ErrorMessage || validationError.message || 'خطا در اعتبارسنجی';
+            showError('خطا در اعتبارسنجی', errorMessage);
+          });
+        } else if (errorData.message) {
+          showError('خطا در ثبت تعرفه سطح 1', errorData.message);
+        } else {
+          showError('خطا در ثبت تعرفه سطح 1', 'خطای غیرمنتظره‌ای رخ داده است');
+        }
+      } else if (error.message) {
+        showError('خطا در ثبت تعرفه سطح 1', error.message);
+      } else {
+        showError('خطا در ثبت تعرفه سطح 1', 'خطای غیرمنتظره‌ای رخ داده است');
+      }
     }
   });
 
@@ -104,7 +136,8 @@ const TariffModal: React.FC<TariffModalProps> = ({ isOpen, onClose, onSubmit }) 
                 </label>
                 <input
                   {...register('tariffNumber', { required: 'شماره تعرفه الزامی است' })}
-                  type="text"
+                  type="number"
+                  inputMode="numeric"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-yekan text-sm"
                   dir="ltr"
                   placeholder="شماره تعرفه را وارد کنید"
@@ -202,6 +235,7 @@ const TariffModal: React.FC<TariffModalProps> = ({ isOpen, onClose, onSubmit }) 
           </motion.div>
         </motion.div>
       )}
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </AnimatePresence>
   );
 };
