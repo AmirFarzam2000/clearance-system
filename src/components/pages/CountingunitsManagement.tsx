@@ -4,11 +4,16 @@ import { MagnifyingGlassIcon, Cog6ToothIcon } from '@heroicons/react/24/outline'
 import PageHeader from '../ui/PageHeader';
 import Table from '../ui/Table';
 import HomeIcon from '../ui/icons/HomeIcon';
-import { useCountingunits } from '../../hooks/useCountingunits';
+import { useCountingunits, useDeleteCountingunit } from '../../hooks/useCountingunits';
+import { ConfirmModal } from '../ui/Modal';
 
 const CountingunitsManagement: React.FC = () => {
   const [searchValue, setSearchValue] = useState('');
-  const { data: countingUnits = [], isLoading, error } = useCountingunits();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedCountingUnit, setSelectedCountingUnit] = useState<any>(null);
+  
+  const { data: countingUnits = [], isLoading, error, refetch } = useCountingunits();
+  const deleteCountingunitMutation = useDeleteCountingunit();
 
   const columns = [
     { key: 'actions', title: 'عملیات', width: 120 },
@@ -27,7 +32,27 @@ const CountingunitsManagement: React.FC = () => {
   };
 
   const handleDelete = (row: any) => {
-    console.log('Delete counting unit:', row);
+    setSelectedCountingUnit(row);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedCountingUnit) return;
+    
+    try {
+      await deleteCountingunitMutation.mutateAsync(selectedCountingUnit.CountingUnitID);
+      alert('واحد شمارشی با موفقیت حذف شد');
+      setDeleteModalOpen(false);
+      setSelectedCountingUnit(null);
+      refetch();
+    } catch (error: any) {
+      alert('خطا در حذف واحد شمارشی');
+    }
+  };
+
+  const handleCloseDeleteModal = () => {
+    setDeleteModalOpen(false);
+    setSelectedCountingUnit(null);
   };
 
   const handleAddNew = () => {
@@ -121,7 +146,6 @@ const CountingunitsManagement: React.FC = () => {
                 <Cog6ToothIcon className="w-4 h-4" />
               </button>
             </div>
-            </div>
 
             <div className="overflow-y-auto" style={{ maxHeight: '600px' }}>
               <Table
@@ -143,6 +167,19 @@ const CountingunitsManagement: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={deleteModalOpen}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        title="تأیید حذف"
+        message={`آیا از حذف واحد شمارشی "${selectedCountingUnit?.FaTitle}" اطمینان دارید؟`}
+        confirmText="حذف"
+        cancelText="انصراف"
+        confirmButtonColor="red"
+        isLoading={deleteCountingunitMutation.isPending}
+      />
+    </div>
   );
 };
 
