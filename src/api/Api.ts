@@ -79,9 +79,6 @@ api.interceptors.request.use(
         if (userSession.UserFiscalPeriods && userSession.UserFiscalPeriods.length > 0) {
           const fiscalPeriodId = userSession.UserFiscalPeriods[0].FiscalPeriodID;
           config.headers['FiscalPeriodID'] = fiscalPeriodId.toString();
-          console.log('Added FiscalPeriodID header:', fiscalPeriodId);
-        } else {
-          console.log('No fiscal periods found for user');
         }
       }
     }

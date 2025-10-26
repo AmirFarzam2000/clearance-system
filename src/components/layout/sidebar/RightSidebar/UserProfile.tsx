@@ -4,10 +4,6 @@ import { authApi } from '../../../../api/auth.api';
 const UserProfile: React.FC = () => {
   const user = authApi.getCurrentUser();
   
-  console.log('User from localStorage:', user);
-  console.log('User FirstName:', user?.FirstName);
-  console.log('User LastName:', user?.LastName);
-  
   const fullName = user 
     ? `${user.FirstName || ''} ${user.LastName || ''}`.trim() 
     : 'کاربر';
