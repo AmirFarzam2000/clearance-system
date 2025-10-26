@@ -11,8 +11,11 @@ function AppRoutes() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const initializeApp = () => {
+    const initializeApp = async () => {
       authApi.initialize();
+      
+      // Show loading for at least 2 seconds for better UX
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       const user = authApi.getCurrentUser();
       const authenticated = authApi.isAuthenticated() && validateToken(user?.token || '');
