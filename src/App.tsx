@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './components/layout/LoginPage';
 import Dashboard from './components/layout/Dashboard';
 import { authApi } from './api/auth.api';
+import { validateToken } from './api/Api';
 
 function AppRoutes() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -12,12 +13,34 @@ function AppRoutes() {
     const initializeApp = () => {
       authApi.initialize();
       
-      const authenticated = authApi.isAuthenticated();
+      const user = authApi.getCurrentUser();
+      const authenticated = authApi.isAuthenticated() && validateToken(user?.token || '');
+      
+      if (!authenticated) {
+        authApi.logout();
+      }
+      
       setIsAuthenticated(authenticated);
       setIsLoading(false);
     };
 
     initializeApp();
+  }, []);
+
+  useEffect(() => {
+    // Check token expiration every minute
+    const tokenCheckInterval = setInterval(() => {
+      const user = authApi.getCurrentUser();
+      if (!user || !validateToken(user.token || '')) {
+        authApi.logout();
+        setIsAuthenticated(false);
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      }
+    }, 60000); // Check every minute
+
+    return () => clearInterval(tokenCheckInterval);
   }, []);
 
   const handleLoginSuccess = () => {
