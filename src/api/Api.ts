@@ -62,7 +62,17 @@ api.interceptors.request.use(
 
     if (!noNeedToAuthHeaderRoutes.includes(config.url || '')) {
       const userSession = getCachedToken();
-      if (userSession?.token && validateToken(userSession.token)) {
+      
+      // Check if token is expired before making request
+      if (userSession?.token) {
+        if (!validateToken(userSession.token)) {
+          clearBusinessFormData();
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+          return Promise.reject(new Error('Token expired'));
+        }
+        
         config.headers = config.headers || {};
         config.headers.Authorization = `Bearer ${userSession.token}`;
         
