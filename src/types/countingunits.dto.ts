@@ -1,5 +1,5 @@
 export interface CountingUnit {
-  CountingUnitID: number | null;
+  CountingUnitID: number;
   FaTitle: string;
   EnTitle: string;
   Description: string;
