@@ -22,7 +22,7 @@ const FormButtons: React.FC<FormButtonsProps> = ({
       <button
         type="button"
         onClick={onBack}
-        className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-yekan-medium text-sm w-full md:w-auto order-2 md:order-1"
+        className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors font-yekan-medium text-sm w-full md:w-auto order-2 md:order-1"
       >
         {backText}
       </button>

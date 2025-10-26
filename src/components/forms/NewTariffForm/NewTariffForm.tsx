@@ -109,10 +109,11 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
 
   const handleFormSubmit = async (data: TariffFormData) => {
     const selectedL2 = tarrifL2s.find(t => t.TarrifL2ID.toString() === data.tariffLevel2);
-    const payload = buildPayload(data, selectedL2);
+    const payload = buildPayload(data, selectedL2, countingUnits);
 
     console.log('Sending payload:', payload);
     console.log('Selected L2:', selectedL2);
+    console.log('Counting Units:', countingUnits);
 
     try {
       console.log('Attempting to create Tariff L3 with payload:', JSON.stringify(payload, null, 2));

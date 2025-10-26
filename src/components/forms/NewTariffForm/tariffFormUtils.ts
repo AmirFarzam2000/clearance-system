@@ -17,19 +17,18 @@ export interface TariffFormData {
   uniqueCodeSubject: boolean;
 }
 
-export const COUNTING_UNIT_MAP: { [key: string]: number } = {
-  'pcs': 1,
-  'kg': 2,
-  'ctn': 3,
-  'set': 4,
-  'pair': 5,
-  'litr': 6
-};
-
 export const buildPayload = (
   data: TariffFormData,
-  selectedL2: TarrifL2 | undefined
+  selectedL2: TarrifL2 | undefined,
+  countingUnits: any[] = []
 ): any => {
+  // Find counting unit titles by ID
+  const getCountingUnitTitle = (unitId: string) => {
+    if (!unitId) return '';
+    const unit = countingUnits.find(u => u.CountingUnitID?.toString() === unitId);
+    return unit ? unit.FaTitle : '';
+  };
+
   return {
     TarrifL3ID: null,
     ParentID: selectedL2?.TarrifL2ID || 0,
@@ -37,12 +36,12 @@ export const buildPayload = (
     ProductType: data.productType || '',
     CustomDuty: parseFloat(data.customsDuties) || 0,
     CommercialBenefit: parseFloat(data.commercialProfit) || 0,
-    FirstCountingUnitID: COUNTING_UNIT_MAP[data.countingUnit1] || 0,
-    FirstCountingUnitTitle: data.countingUnit1 || '',
-    SecondCountingUnitID: data.countingUnit2 ? COUNTING_UNIT_MAP[data.countingUnit2] : null,
-    SecondCountingUnitTitle: data.countingUnit2 || '',
-    ThirdCountingUnitID: data.countingUnit3 ? COUNTING_UNIT_MAP[data.countingUnit3] : null,
-    ThirdCountingUnitTitle: data.countingUnit3 || '',
+    FirstCountingUnitID: data.countingUnit1 ? parseInt(data.countingUnit1) : null,
+    FirstCountingUnitTitle: getCountingUnitTitle(data.countingUnit1),
+    SecondCountingUnitID: data.countingUnit2 ? parseInt(data.countingUnit2) : null,
+    SecondCountingUnitTitle: getCountingUnitTitle(data.countingUnit2),
+    ThirdCountingUnitID: data.countingUnit3 ? parseInt(data.countingUnit3) : null,
+    ThirdCountingUnitTitle: getCountingUnitTitle(data.countingUnit3),
     PreferentialTarrifCountryCode: data.preferentialCountryCode || '',
     Remark: data.notes || '',
     Description: data.description || '',
