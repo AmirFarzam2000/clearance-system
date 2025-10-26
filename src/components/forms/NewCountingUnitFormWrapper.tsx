@@ -1,15 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import NewCountingUnitForm from './NewCountingUnitForm';
-import ErrorModal from '../ui/ErrorModal';
 import { useCreateCountingunit } from '../../hooks/useCountingunits';
+import { useToast } from '../../hooks/useToast';
+import ToastContainer from '../ui/Toast';
 import type { CountingUnit } from '../../types/countingunits.dto';
 
 const NewCountingUnitFormWrapper: React.FC = () => {
   const navigate = useNavigate();
   const createCountingunitMutation = useCreateCountingunit();
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorData, setErrorData] = useState<any>(null);
+  const { toasts, removeToast, showSuccess, showError } = useToast();
 
   const handleSubmit = async (data: any) => {
     try {
@@ -22,18 +22,35 @@ const NewCountingUnitFormWrapper: React.FC = () => {
       };
 
       await createCountingunitMutation.mutateAsync(payload);
-      navigate('/dashboard/countingunits-management');
+      showSuccess('موفقیت', 'واحد شمارشی جدید با موفقیت ثبت شد');
+      setTimeout(() => {
+        navigate('/dashboard/countingunits-management');
+      }, 1500);
     } catch (error: any) {
       console.error('Error creating counting unit:', error);
+      
       if (error?.response?.data) {
-        const errorResponse = error.response.data;
-        if (errorResponse.ActionErrors?.length > 0 || errorResponse.ValidationErrors?.length > 0) {
-          setErrorData(errorResponse);
-          setShowErrorModal(true);
-          return;
+        const errorData = error.response.data;
+        
+        if (errorData.ActionErrors && errorData.ActionErrors.length > 0) {
+          errorData.ActionErrors.forEach((errorMsg: string) => {
+            showError('خطا در ثبت واحد شمارشی', errorMsg);
+          });
+        } else if (errorData.ValidationErrors && errorData.ValidationErrors.length > 0) {
+          errorData.ValidationErrors.forEach((validationError: any) => {
+            const errorMessage = validationError.ErrorMessage || validationError.message || 'خطا در اعتبارسنجی';
+            showError('خطا در اعتبارسنجی', errorMessage);
+          });
+        } else if (errorData.message) {
+          showError('خطا در ثبت واحد شمارشی', errorData.message);
+        } else {
+          showError('خطا در ثبت واحد شمارشی', 'خطای غیرمنتظره‌ای رخ داده است');
         }
+      } else if (error.message) {
+        showError('خطا در ثبت واحد شمارشی', error.message);
+      } else {
+        showError('خطا در ثبت واحد شمارشی', 'خطای غیرمنتظره‌ای رخ داده است');
       }
-      alert('خطا در ایجاد واحد شمارشی. لطفاً دوباره تلاش کنید.');
     }
   };
 
@@ -47,11 +64,7 @@ const NewCountingUnitFormWrapper: React.FC = () => {
         onBack={handleBack}
         onSubmit={handleSubmit}
       />
-      <ErrorModal
-        isOpen={showErrorModal}
-        onClose={() => setShowErrorModal(false)}
-        error={errorData}
-      />
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );
 };
