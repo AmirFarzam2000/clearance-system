@@ -17,7 +17,7 @@ export const countingunitsApi = {
   },
 
   updateCountingunit: async (countingunit: CountingUnit): Promise<CountingUnit> => {
-    const response = await api.put(`/countingunits/${countingunit.CountingUnitID}`, countingunit);
+    const response = await api.put(`/countingunits/`, countingunit);
     return response.data;
   },
 
