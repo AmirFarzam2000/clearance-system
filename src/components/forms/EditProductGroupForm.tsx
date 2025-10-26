@@ -10,6 +10,8 @@ import FormTextarea from './FormTextarea';
 import FormButtons from './FormButtons';
 import { SuccessModal } from '../ui/SuccessModal';
 import { useProductgroup, useUpdateProductgroup, useProductGroupLevels } from '../../hooks/useProductgroups';
+import { useToast } from '../../hooks/useToast';
+import ToastContainer from '../ui/Toast';
 import type { Productgroup } from '../../types/productgroup.dto';
 
 interface ProductGroupFormData {
@@ -34,6 +36,7 @@ const EditProductGroupForm: React.FC = () => {
   const { data: productGroup, isLoading: isLoadingProductGroup, error } = useProductgroup(Number(id || 0));
   const updateProductgroupMutation = useUpdateProductgroup();
   const { data: productGroupLevels = [], isLoading: isLoadingLevels } = useProductGroupLevels();
+  const { toasts, removeToast, showError } = useToast();
 
   const categoryOptions = productGroupLevels.map((level: any) => ({
     value: level.ProductGroupLevelID?.toString() || '',
@@ -84,8 +87,31 @@ const EditProductGroupForm: React.FC = () => {
 
       await updateProductgroupMutation.mutateAsync(payload);
       setShowSuccessModal(true);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating product group:', error);
+      
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        
+        if (errorData.ActionErrors && errorData.ActionErrors.length > 0) {
+          errorData.ActionErrors.forEach((errorMsg: string) => {
+            showError('خطا در ویرایش گروه کالا', errorMsg);
+          });
+        } else if (errorData.ValidationErrors && errorData.ValidationErrors.length > 0) {
+          errorData.ValidationErrors.forEach((validationError: any) => {
+            const errorMessage = validationError.ErrorMessage || validationError.message || 'خطا در اعتبارسنجی';
+            showError('خطا در اعتبارسنجی', errorMessage);
+          });
+        } else if (errorData.message) {
+          showError('خطا در ویرایش گروه کالا', errorData.message);
+        } else {
+          showError('خطا در ویرایش گروه کالا', 'خطای غیرمنتظره‌ای رخ داده است');
+        }
+      } else if (error.message) {
+        showError('خطا در ویرایش گروه کالا', error.message);
+      } else {
+        showError('خطا در ویرایش گروه کالا', 'خطای غیرمنتظره‌ای رخ داده است');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -219,6 +245,8 @@ const EditProductGroupForm: React.FC = () => {
         title="موفق"
         message="اطلاعات گروه کالا با موفقیت به‌روزرسانی شد"
       />
+      
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );
 };
