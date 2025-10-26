@@ -8,8 +8,9 @@ import FormInput from './FormInput';
 import FormTextarea from './FormTextarea';
 import FormButtons from './FormButtons';
 import { SuccessModal } from '../ui/SuccessModal';
-import ErrorModal from '../ui/ErrorModal';
 import { useCountingunit, useUpdateCountingunit } from '../../hooks/useCountingunits';
+import { useToast } from '../../hooks/useToast';
+import ToastContainer from '../ui/Toast';
 import type { CountingUnit } from '../../types/countingunits.dto';
 
 interface CountingUnitFormData {
@@ -27,12 +28,11 @@ const EditCountingUnitForm: React.FC = () => {
     description: ''
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [showErrorModal, setShowErrorModal] = useState(false);
-  const [errorData, setErrorData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const { data: countingUnit, isLoading: isLoadingCountingUnit, error } = useCountingunit(Number(id || 0));
   const updateCountingunitMutation = useUpdateCountingunit();
+  const { toasts, removeToast, showError } = useToast();
 
   useEffect(() => {
     if (countingUnit) {
@@ -58,27 +58,42 @@ const EditCountingUnitForm: React.FC = () => {
     setIsLoading(true);
     
     try {
-      const payload: any = {
-        CountingUnitID: countingUnit.CountingUnitID,
+      const payload = {
+        CountingUnitID: countingUnit.CountingUnitID || 0,
         FaTitle: formData.faTitle,
         EnTitle: formData.enTitle,
         Description: formData.description || '',
         RowVersion: countingUnit.RowVersion
       };
 
+      console.log('Payload being sent:', payload);
       await updateCountingunitMutation.mutateAsync(payload);
       setShowSuccessModal(true);
     } catch (error: any) {
       console.error('Error updating counting unit:', error);
+      
       if (error?.response?.data) {
-        const errorResponse = error.response.data;
-        if (errorResponse.ActionErrors?.length > 0 || errorResponse.ValidationErrors?.length > 0) {
-          setErrorData(errorResponse);
-          setShowErrorModal(true);
-          return;
+        const errorData = error.response.data;
+        
+        if (errorData.ActionErrors && errorData.ActionErrors.length > 0) {
+          errorData.ActionErrors.forEach((errorMsg: string) => {
+            showError('خطا در ویرایش واحد شمارشی', errorMsg);
+          });
+        } else if (errorData.ValidationErrors && errorData.ValidationErrors.length > 0) {
+          errorData.ValidationErrors.forEach((validationError: any) => {
+            const errorMessage = validationError.ErrorMessage || validationError.message || 'خطا در اعتبارسنجی';
+            showError('خطا در اعتبارسنجی', errorMessage);
+          });
+        } else if (errorData.message) {
+          showError('خطا در ویرایش واحد شمارشی', errorData.message);
+        } else {
+          showError('خطا در ویرایش واحد شمارشی', 'خطای غیرمنتظره‌ای رخ داده است');
         }
+      } else if (error.message) {
+        showError('خطا در ویرایش واحد شمارشی', error.message);
+      } else {
+        showError('خطا در ویرایش واحد شمارشی', 'خطای غیرمنتظره‌ای رخ داده است');
       }
-      alert('خطا در به‌روزرسانی واحد شمارشی. لطفاً دوباره تلاش کنید.');
     } finally {
       setIsLoading(false);
     }
@@ -209,11 +224,7 @@ const EditCountingUnitForm: React.FC = () => {
         message="اطلاعات واحد شمارشی با موفقیت به‌روزرسانی شد"
       />
       
-      <ErrorModal
-        isOpen={showErrorModal}
-        onClose={() => setShowErrorModal(false)}
-        error={errorData}
-      />
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );
 };
