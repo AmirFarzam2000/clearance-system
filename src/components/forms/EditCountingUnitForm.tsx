@@ -10,7 +10,6 @@ import FormButtons from './FormButtons';
 import { SuccessModal } from '../ui/SuccessModal';
 import ErrorModal from '../ui/ErrorModal';
 import { useCountingunit, useUpdateCountingunit } from '../../hooks/useCountingunits';
-import type { CountingUnit } from '../../types/countingunits.dto';
 
 interface CountingUnitFormData {
   faTitle: string;
