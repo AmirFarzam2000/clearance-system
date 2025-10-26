@@ -14,7 +14,7 @@ const UserProfile: React.FC = () => {
 
   const avatarUrl = user?.avatar 
     ? user.avatar 
-    : 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=50&h=50&fit=crop&crop=face';
+    : '/Image/profile_av.jpg';
 
   return (
     <div className="px-6 py-5 border-b border-gray-200">

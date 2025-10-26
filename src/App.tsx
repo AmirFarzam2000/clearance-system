@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './components/layout/LoginPage';
 import Dashboard from './components/layout/Dashboard';
+import Loading from './components/ui/Loading';
 import { authApi } from './api/auth.api';
 import { validateToken } from './api/Api';
 
@@ -51,14 +52,7 @@ function AppRoutes() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-yekan">در حال بارگذاری...</p>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
