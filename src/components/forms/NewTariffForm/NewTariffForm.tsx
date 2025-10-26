@@ -8,6 +8,8 @@ import TariffL2Modal from '../../ui/TariffL2Modal';
 import useModal from '../../../hooks/useModal';
 import { useTarrifL1s, useTarrifL2s, useCreateTarrifL3 } from '../../../hooks/useTarrifs';
 import { useCountingunits } from '../../../hooks/useCountingunits';
+import { useToast } from '../../../hooks/useToast';
+import ToastContainer from '../../ui/Toast';
 import TariffLevel1Section from './TariffLevel1Section';
 import TariffLevel2Section from './TariffLevel2Section';
 import CountingUnitSection from './CountingUnitSection';
@@ -30,6 +32,7 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
   const { data: tarrifL2s = [], isLoading: isLoadingL2 } = useTarrifL2s();
   const { data: countingUnits = [], isLoading: isLoadingCountingUnits } = useCountingunits();
   const createTarrifL3Mutation = useCreateTarrifL3();
+  const { toasts, removeToast, showSuccess, showError } = useToast();
 
   const {
     register,
@@ -70,13 +73,39 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
   useEffect(() => {
     if (createTarrifL3Mutation.error) {
       const error = createTarrifL3Mutation.error as any;
+      
+      // Show toast notification for backend errors
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        
+        if (errorData.ActionErrors && errorData.ActionErrors.length > 0) {
+          errorData.ActionErrors.forEach((errorMsg: string) => {
+            showError('خطا در ثبت تعرفه', errorMsg);
+          });
+        } else if (errorData.ValidationErrors && errorData.ValidationErrors.length > 0) {
+          errorData.ValidationErrors.forEach((validationError: any) => {
+            const errorMessage = validationError.ErrorMessage || validationError.message || 'خطا در اعتبارسنجی';
+            showError('خطا در اعتبارسنجی', errorMessage);
+          });
+        } else if (errorData.message) {
+          showError('خطا در ثبت تعرفه', errorData.message);
+        } else {
+          showError('خطا در ثبت تعرفه', 'خطای غیرمنتظره‌ای رخ داده است');
+        }
+      } else if (error.message) {
+        showError('خطا در ثبت تعرفه', error.message);
+      } else {
+        showError('خطا در ثبت تعرفه', 'خطای غیرمنتظره‌ای رخ داده است');
+      }
+      
+      // Map validation errors to form fields
       if (error?.response?.data?.ValidationErrors) {
         mapValidationErrors(error.response.data.ValidationErrors, (name, error) => {
           setError(name as keyof TariffFormData, error as any);
         });
       }
     }
-  }, [createTarrifL3Mutation.error, setError]);
+  }, [createTarrifL3Mutation.error, setError, showError]);
 
   const handleFormSubmit = async (data: TariffFormData) => {
     const selectedL2 = tarrifL2s.find(t => t.TarrifL2ID.toString() === data.tariffLevel2);
@@ -89,7 +118,10 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
       console.log('Attempting to create Tariff L3 with payload:', JSON.stringify(payload, null, 2));
       const result = await createTarrifL3Mutation.mutateAsync(payload);
       console.log('Success! Response:', result);
-      onBack();
+      showSuccess('موفقیت', 'تعرفه جدید با موفقیت ثبت شد');
+      setTimeout(() => {
+        onBack();
+      }, 1500);
     } catch (error: any) {
       console.error('Error creating tariff L3:', error);
       console.error('Error response:', error?.response?.data);
@@ -274,6 +306,8 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
           tarrifNo: parentTarrifL1.TarrifNo.toString()
         } : undefined}
       />
+      
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 };
