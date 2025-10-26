@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import HomeIcon from '../ui/icons/HomeIcon';
 import PageHeader from '../ui/PageHeader';
 import { SuccessModal } from '../ui/SuccessModal';
-import { useCreateCurrency, useCurrencies } from '../../hooks/useCurrencies';
+import { useCreateCurrency } from '../../hooks/useCurrencies';
 
 interface CurrencyFormData {
   title: string;
@@ -17,7 +17,6 @@ const NewCurrencyForm: React.FC = () => {
   const navigate = useNavigate();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const createCurrencyMutation = useCreateCurrency();
-  const { data: existingCurrencies = [] } = useCurrencies();
   
   const {
     register,
@@ -137,12 +136,6 @@ const NewCurrencyForm: React.FC = () => {
                       pattern: {
                         value: /^[A-Z]{3}$/,
                         message: 'کد ISO باید 3 حرف بزرگ انگلیسی باشد'
-                      },
-                      validate: (value) => {
-                        const isDuplicate = existingCurrencies.some(
-                          currency => currency.ISO.toUpperCase() === value.toUpperCase()
-                        );
-                        return !isDuplicate || 'کد ISO تکراری است';
                       }
                     })}
                     className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-yekan text-sm ${
