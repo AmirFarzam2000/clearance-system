@@ -11,7 +11,6 @@ import { SuccessModal } from '../ui/SuccessModal';
 import { useCountingunit, useUpdateCountingunit } from '../../hooks/useCountingunits';
 import { useToast } from '../../hooks/useToast';
 import ToastContainer from '../ui/Toast';
-import type { CountingUnit } from '../../types/countingunits.dto';
 
 interface CountingUnitFormData {
   faTitle: string;

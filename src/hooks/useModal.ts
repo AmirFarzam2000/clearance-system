@@ -1,10 +1,10 @@
 "use client"
 import { useState } from "react";
 
-function useModal<T = any>() {
+function useModal() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const openModal = (meta?: T) => {
+  const openModal = () => {
     setIsOpen(true);
   };
 

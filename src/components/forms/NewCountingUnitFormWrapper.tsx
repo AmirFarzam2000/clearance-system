@@ -4,7 +4,6 @@ import NewCountingUnitForm from './NewCountingUnitForm';
 import { useCreateCountingunit } from '../../hooks/useCountingunits';
 import { useToast } from '../../hooks/useToast';
 import ToastContainer from '../ui/Toast';
-import type { CountingUnit } from '../../types/countingunits.dto';
 
 const NewCountingUnitFormWrapper: React.FC = () => {
   const navigate = useNavigate();

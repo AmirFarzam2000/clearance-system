@@ -37,7 +37,7 @@ const EditTariffModal: React.FC<EditTariffModalProps> = ({
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: {},
     reset
   } = useForm<any>({
     defaultValues: {

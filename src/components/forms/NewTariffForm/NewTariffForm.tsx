@@ -62,7 +62,7 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
   });
 
   const selectedTariffLevel1 = watch('tariffLevel1');
-  const selectedTariffLevel2 = watch('tariffLevel2');
+  // const selectedTariffLevel2 = watch('tariffLevel2');
 
   useEffect(() => {
     if (selectedTariffLevel1) {
