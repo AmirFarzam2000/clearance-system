@@ -149,7 +149,7 @@ const CountingunitsManagement: React.FC = () => {
               </div>
               <button
                 onClick={handleAddNew}
-                className="px-4 py-2 border-blue-700 border-[1px] rounded-lg text-blue-700 hover:bg-blue-700 transition-colors font-yekan-medium text-sm whitespace-nowrap w-full md:w-auto"
+                className="px-4 py-2 border-blue-700 border-[1px] rounded-lg text-blue-700 hover:bg-blue-700 hover:text-white transition-colors font-yekan-medium text-sm whitespace-nowrap w-full md:w-auto"
               >
                 تعریف واحد شمارشی جدید
               </button>
