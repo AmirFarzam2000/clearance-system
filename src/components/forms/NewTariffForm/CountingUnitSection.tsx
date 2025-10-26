@@ -6,6 +6,7 @@ import SelectField from '../../ui/SelectField';
 interface CountingUnitOption {
   value: string;
   label: string;
+  description?: string;
 }
 
 interface CountingUnitSectionProps {
@@ -16,6 +17,7 @@ interface CountingUnitSectionProps {
   options: CountingUnitOption[];
   placeholder: string;
   required?: boolean;
+  isLoading?: boolean;
 }
 
 const CountingUnitSection: React.FC<CountingUnitSectionProps> = ({
@@ -25,7 +27,8 @@ const CountingUnitSection: React.FC<CountingUnitSectionProps> = ({
   errors,
   options,
   placeholder,
-  required = false
+  required = false,
+  isLoading = false
 }) => {
   const rules = required ? { required: `${label} الزامی است` } : undefined;
 
@@ -41,7 +44,8 @@ const CountingUnitSection: React.FC<CountingUnitSectionProps> = ({
             value={field.value}
             onChange={field.onChange}
             options={options}
-            placeholder={placeholder}
+            placeholder={isLoading ? "در حال بارگذاری..." : placeholder}
+            disabled={isLoading}
           />
         )}
       />
