@@ -5,11 +5,11 @@ const UserProfile: React.FC = () => {
   const user = authApi.getCurrentUser();
   
   console.log('User from localStorage:', user);
-  console.log('User firstName:', user?.firstName);
-  console.log('User lastName:', user?.lastName);
+  console.log('User FirstName:', user?.FirstName);
+  console.log('User LastName:', user?.LastName);
   
   const fullName = user 
-    ? `${user.firstName || ''} ${user.lastName || ''}`.trim() 
+    ? `${user.FirstName || ''} ${user.LastName || ''}`.trim() 
     : 'کاربر';
 
   const avatarUrl = user?.avatar 

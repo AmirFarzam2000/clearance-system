@@ -1,24 +1,39 @@
  export interface SessionUserModel {
-    id: number;
-    firstName: string;
-    lastName: string;
-    username: string;
-    roles: string[];
-    customerRoles: string[];
-    avatar: string;
-    lastLoginTime: string;
-    lastLoginIP: string;
-    isSuperAdmin: boolean;
-    isUser: boolean;
-    baseRole: string;
-    companyName: string;
-    expireDate: string;
-    remainsDay: number;
-    token: string;
-    UserFiscalPeriods: Array<{
+    Id?: number;
+    id?: number;
+    FirstName?: string;
+    firstName?: string;
+    LastName?: string;
+    lastName?: string;
+    Username?: string;
+    username?: string;
+    Roles?: string[];
+    roles?: string[];
+    CustomerRoles?: string[];
+    customerRoles?: string[];
+    Avatar?: string;
+    avatar?: string;
+    LastLoginTime?: string;
+    lastLoginTime?: string;
+    LastLoginIP?: string;
+    lastLoginIP?: string;
+    IsSuperAdmin?: boolean;
+    isSuperAdmin?: boolean;
+    IsUser?: boolean;
+    isUser?: boolean;
+    BaseRole?: string;
+    baseRole?: string;
+    CompanyName?: string;
+    companyName?: string;
+    ExpireDate?: string;
+    expireDate?: string;
+    RemainsDay?: number;
+    remainsDay?: number;
+    token?: string;
+    UserFiscalPeriods?: Array<{
       userID: number;
       FiscalPeriodID: number;
       fiscalPeriodName: string;
     }>;
-    isMultiFiscalPeriod: boolean;
+    isMultiFiscalPeriod?: boolean;
   }
