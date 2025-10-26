@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import NewCountingUnitForm from './NewCountingUnitForm';
 import ErrorModal from '../ui/ErrorModal';
 import { useCreateCountingunit } from '../../hooks/useCountingunits';
-import type { CountingUnit } from '../../types/countingunits.dto';
 
 const NewCountingUnitFormWrapper: React.FC = () => {
   const navigate = useNavigate();
