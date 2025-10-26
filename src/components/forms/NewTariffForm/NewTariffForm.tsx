@@ -7,6 +7,7 @@ import TariffModal from '../../ui/TariffModal';
 import TariffL2Modal from '../../ui/TariffL2Modal';
 import useModal from '../../../hooks/useModal';
 import { useTarrifL1s, useTarrifL2s, useCreateTarrifL3 } from '../../../hooks/useTarrifs';
+import { useCountingunits } from '../../../hooks/useCountingunits';
 import TariffLevel1Section from './TariffLevel1Section';
 import TariffLevel2Section from './TariffLevel2Section';
 import CountingUnitSection from './CountingUnitSection';
@@ -21,20 +22,13 @@ interface NewTariffFormProps {
   onBack: () => void;
 }
 
-const COUNTING_UNIT_OPTIONS = [
-  { value: 'pcs', label: 'عدد (PCS)' },
-  { value: 'kg', label: 'کیلوگرم (KG)' },
-  { value: 'ctn', label: 'کارتن (CTN)' },
-  { value: 'set', label: 'ست (SET)' },
-  { value: 'pair', label: 'جفت (Pair)' },
-  { value: 'litr', label: 'لیتر (Litr)' }
-];
 
 const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
   const tariffModal = useModal();
   const tariffL2Modal = useModal();
   const { data: tarrifL1s = [], isLoading } = useTarrifL1s();
   const { data: tarrifL2s = [], isLoading: isLoadingL2 } = useTarrifL2s();
+  const { data: countingUnits = [], isLoading: isLoadingCountingUnits } = useCountingunits();
   const createTarrifL3Mutation = useCreateTarrifL3();
 
   const {
@@ -133,16 +127,22 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
         }))
     : [];
 
+  const countingUnitOptions = countingUnits.map(unit => ({
+    value: unit.CountingUnitID?.toString() || '',
+    label: `${unit.FaTitle} (${unit.EnTitle})`,
+    description: unit.Description
+  }));
+
   return (
-    <div className="flex-1 bg-gray-50">
-      <div className="p-5">
-        <div className="mx-auto max-w-full">
+    <div className="flex-1 bg-gray-50 flex flex-col">
+      <div className="p-5 flex-1 flex flex-col">
+        <div className=" max-w-full flex-1 flex flex-col">
           <div style={{
             borderRadius: '10px',
             background: '#f5f5f5',
             border: '5px solid #fff',
             boxShadow: '0 0 16px #292a330f, 0 6px 20px #292a3305'
-          }} className="p-3 md:p-5 lg:p-[20px]">
+          }} className="p-3 md:p-5 lg:p-[20px] flex-1 flex flex-col">
 
             <PageHeader 
               title="تعرفه جدید" 
@@ -156,11 +156,11 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
               onSearch={() => {}}
             />
             
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6 flex-1 flex flex-col">
               <FormErrorDisplay error={createTarrifL3Mutation.error} />
 
-              <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
-                <div className="mx-auto space-y-4">
+              <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col">
+                <div className="flex-1 overflow-y-auto space-y-4 pr-2" style={{ maxHeight: 'calc(100vh - 300px)' }}>
                   <TariffLevel1Section
                     control={control}
                     errors={errors}
@@ -183,8 +183,9 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
                     label="واحد اول شمارش تعرفه : (برای استفاده در فاکتور مورد استفاده قرار میگیرد)"
                     control={control}
                     errors={errors}
-                    options={COUNTING_UNIT_OPTIONS}
+                    options={countingUnitOptions}
                     placeholder="واحد اول شمارشی را انتخاب نمایید"
+                    isLoading={isLoadingCountingUnits}
                     required
                   />
 
@@ -193,8 +194,9 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
                     label="واحد دوم شمارش تعرفه : (برای استفاده در بارنامه مورد استفاده قرار میگیرد و معمولاً کارتن می باشد)"
                     control={control}
                     errors={errors}
-                    options={COUNTING_UNIT_OPTIONS}
+                    options={countingUnitOptions}
                     placeholder="واحد دوم شمارشی را انتخاب نمایید"
+                    isLoading={isLoadingCountingUnits}
                   />
 
                   <CountingUnitSection
@@ -202,8 +204,9 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
                     label="واحد سوم شمارش تعرفه :"
                     control={control}
                     errors={errors}
-                    options={COUNTING_UNIT_OPTIONS}
+                    options={countingUnitOptions}
                     placeholder="واحد سوم شمارشی را انتخاب نمایید"
+                    isLoading={isLoadingCountingUnits}
                   />
 
                   <BasicFieldsSection control={control} errors={errors} />
@@ -241,12 +244,14 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
                   />
                 </div>
 
-                <FormButtons
-                  onBack={onBack}
-                  onSubmit={handleSubmit(handleFormSubmit)}
-                  backText="بازگشت به لیست تعرفه های سطح سوم"
-                  submitText={isSubmitting || createTarrifL3Mutation.isPending ? "در حال ثبت..." : "ثبت اطلاعات"}
-                />
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <FormButtons
+                    onBack={onBack}
+                    onSubmit={handleSubmit(handleFormSubmit)}
+                    backText="بازگشت به لیست تعرفه های سطح سوم"
+                    submitText={isSubmitting || createTarrifL3Mutation.isPending ? "در حال ثبت..." : "ثبت اطلاعات"}
+                  />
+                </div>
               </form>
             </div>
           </div>
