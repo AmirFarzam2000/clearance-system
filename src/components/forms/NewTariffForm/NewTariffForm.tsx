@@ -70,42 +70,7 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
     }
   }, [selectedTariffLevel1, setValue]);
 
-  useEffect(() => {
-    if (createTarrifL3Mutation.error) {
-      const error = createTarrifL3Mutation.error as any;
-      
-      // Show toast notification for backend errors
-      if (error?.response?.data) {
-        const errorData = error.response.data;
-        
-        if (errorData.ActionErrors && errorData.ActionErrors.length > 0) {
-          errorData.ActionErrors.forEach((errorMsg: string) => {
-            showError('خطا در ثبت تعرفه', errorMsg);
-          });
-        } else if (errorData.ValidationErrors && errorData.ValidationErrors.length > 0) {
-          errorData.ValidationErrors.forEach((validationError: any) => {
-            const errorMessage = validationError.ErrorMessage || validationError.message || 'خطا در اعتبارسنجی';
-            showError('خطا در اعتبارسنجی', errorMessage);
-          });
-        } else if (errorData.message) {
-          showError('خطا در ثبت تعرفه', errorData.message);
-        } else {
-          showError('خطا در ثبت تعرفه', 'خطای غیرمنتظره‌ای رخ داده است');
-        }
-      } else if (error.message) {
-        showError('خطا در ثبت تعرفه', error.message);
-      } else {
-        showError('خطا در ثبت تعرفه', 'خطای غیرمنتظره‌ای رخ داده است');
-      }
-      
-      // Map validation errors to form fields
-      if (error?.response?.data?.ValidationErrors) {
-        mapValidationErrors(error.response.data.ValidationErrors, (name, error) => {
-          setError(name as keyof TariffFormData, error as any);
-        });
-      }
-    }
-  }, [createTarrifL3Mutation.error, setError, showError]);
+  // Removed the useEffect - all error handling will be in handleFormSubmit
 
   const handleFormSubmit = async (data: TariffFormData) => {
     const selectedL2 = tarrifL2s.find(t => t.TarrifL2ID.toString() === data.tariffLevel2);
@@ -127,6 +92,35 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
       console.error('Error creating tariff L3:', error);
       console.error('Error response:', error?.response?.data);
       console.error('Error details:', error?.response?.data?.ValidationErrors);
+      
+      // Handle errors with toast notifications
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        
+        if (errorData.ActionErrors && errorData.ActionErrors.length > 0) {
+          errorData.ActionErrors.forEach((errorMsg: string) => {
+            showError('خطا در ثبت تعرفه', errorMsg);
+          });
+        } else if (errorData.ValidationErrors && errorData.ValidationErrors.length > 0) {
+          errorData.ValidationErrors.forEach((validationError: any) => {
+            const errorMessage = validationError.ErrorMessage || validationError.message || 'خطا در اعتبارسنجی';
+            showError('خطا در اعتبارسنجی', errorMessage);
+          });
+          
+          // Map validation errors to form fields
+          mapValidationErrors(errorData.ValidationErrors, (name, error) => {
+            setError(name as keyof TariffFormData, error as any);
+          });
+        } else if (errorData.message) {
+          showError('خطا در ثبت تعرفه', errorData.message);
+        } else {
+          showError('خطا در ثبت تعرفه', 'خطای غیرمنتظره‌ای رخ داده است');
+        }
+      } else if (error.message) {
+        showError('خطا در ثبت تعرفه', error.message);
+      } else {
+        showError('خطا در ثبت تعرفه', 'خطای غیرمنتظره‌ای رخ داده است');
+      }
     }
   };
 
@@ -138,10 +132,9 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
     console.log('New tariff level 2 created:', data);
   };
 
-  const selectedTarrifL2 = tarrifL2s.find(t => t.TarrifL2ID.toString() === selectedTariffLevel2);
-  
-  const parentTarrifL1 = selectedTarrifL2 
-    ? tarrifL1s.find(t => t.TarrifL1ID === selectedTarrifL2.ParentID)
+  // Find the parent TarrifL1 based on selectedTariffLevel1 (the selected L1)
+  const parentTarrifL1 = selectedTariffLevel1 
+    ? tarrifL1s.find(t => t.TarrifL1ID.toString() === selectedTariffLevel1)
     : undefined;
 
   const tariffLevel1Options = tarrifL1s.map(tarrif => ({
