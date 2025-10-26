@@ -7,7 +7,7 @@ import FormInput from './FormInput';
 import CustomSelect from './CustomSelect';
 import FormTextarea from './FormTextarea';
 import FormButtons from './FormButtons';
-import { useProductGroupLevels } from '../../hooks/useProductgroups';
+import { useProductGroupLevels, useCreateProductgroup } from '../../hooks/useProductgroups';
 import { useToast } from '../../hooks/useToast';
 import ToastContainer from '../ui/Toast';
 
@@ -20,11 +20,9 @@ interface ProductGroupFormData {
 
 interface NewProductGroupFormProps {
   onBack: () => void;
-  onSubmit: (data: ProductGroupFormData) => void;
-  error?: any;
 }
 
-const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack, onSubmit }) => {
+const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack }) => {
   const [formData, setFormData] = useState<ProductGroupFormData>({
     category: '',
     title: '',
@@ -32,8 +30,8 @@ const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack, onSub
     description: ''
   });
 
-  const [isLoading, setIsLoading] = useState(false);
   const { data: productGroupLevels = [], isLoading: isLoadingLevels } = useProductGroupLevels();
+  const createProductgroupMutation = useCreateProductgroup();
   const { toasts, removeToast, showSuccess, showError } = useToast();
 
   const categoryOptions = productGroupLevels.map((level: any) => ({
@@ -50,11 +48,27 @@ const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack, onSub
 
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
-    setIsLoading(true);
     
     try {
-      await onSubmit(formData);
+      const selectedLevel = productGroupLevels.find((level: any) => 
+        level.ProductGroupLevelID?.toString() === formData.category
+      );
+
+      const payload = {
+        ProductGroupID: 0,
+        ProductGroupLevelID: selectedLevel?.ProductGroupLevelID || 0,
+        ProductGroupLevelTitle: selectedLevel?.Title || '',
+        Code: formData.code,
+        Title: formData.title,
+        Description: formData.description || '',
+        RowVersion: ''
+      };
+
+      await createProductgroupMutation.mutateAsync(payload);
       showSuccess('موفقیت', 'گروه کالا جدید با موفقیت ثبت شد');
+      setTimeout(() => {
+        onBack();
+      }, 1500);
     } catch (error: any) {
       console.error('Error creating product group:', error);
       
@@ -80,8 +94,6 @@ const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack, onSub
       } else {
         showError('خطا در ثبت گروه کالا', 'خطای غیرمنتظره‌ای رخ داده است');
       }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -148,8 +160,8 @@ const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack, onSub
                   onBack={onBack}
                   onSubmit={handleSubmit}
                   backText="بازگشت به لیست گروه های کالا"
-                  submitText="ثبت اطلاعات"
-                  isLoading={isLoading}
+                  submitText={createProductgroupMutation.isPending ? "در حال ثبت..." : "ثبت اطلاعات"}
+                  isLoading={createProductgroupMutation.isPending}
                 />
               </form>
             </div>
