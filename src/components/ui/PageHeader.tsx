@@ -33,8 +33,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         </div>
        
       </div>
-     <div className="w-10 h-10 hover:bg-blue-600 text-blue-600 border-blue-600 hover:text-white border-[1px] rounded-lg  flex items-center justify-center">
-          <Bars3Icon className="w-5 h-5 text-blue-600 hover:text-white" />
+     <div className="w-10 h-10 hover:bg-blue-600 text-blue-600 border-blue-600 hover:text-white border-[1px] rounded-lg flex items-center justify-center transition-colors">
+          <Bars3Icon className="w-5 h-5 text-blue-600 hover:text-white transition-colors" />
         </div>
     </div>
   );

@@ -185,7 +185,7 @@ const TariffModal: React.FC<TariffModalProps> = ({ isOpen, onClose, onSubmit }) 
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-yekan-medium text-sm"
+                  className="px-6 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-colors font-yekan-medium text-sm"
                 >
                   بازگشت
                 </button>

@@ -9,6 +9,13 @@ export const useProductgroups = () => {
   });
 };
 
+export const useProductGroupLevels = () => {
+  return useQuery({
+    queryKey: ['productGroupLevels'],
+    queryFn: () => productgroupsApi.getProductGroupLevels()
+  });
+};
+
 export const useProductgroup = (id: number) => {
   return useQuery<Productgroup>({
     queryKey: ['productgroup', id],

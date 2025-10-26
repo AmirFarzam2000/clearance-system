@@ -14,6 +14,7 @@ interface CustomSelectProps {
   placeholder?: string;
   required?: boolean;
   className?: string;
+  isLoading?: boolean;
 }
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -23,7 +24,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   options,
   placeholder,
   required = false,
-  className = ''
+  className = '',
+  isLoading = false
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
@@ -57,10 +59,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-yekan text-sm bg-white text-right"
+          disabled={isLoading}
+          className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-yekan text-sm bg-white text-right disabled:opacity-50 disabled:cursor-not-allowed"
           dir="rtl"
         >
-          {selectedOption ? selectedOption.label : placeholder}
+          {isLoading ? 'در حال بارگذاری...' : (selectedOption ? selectedOption.label : placeholder)}
         </button>
         
         <div className="absolute left-3 top-1/2 transform -translate-y-1/2 pointer-events-none">

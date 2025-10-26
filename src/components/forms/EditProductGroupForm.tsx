@@ -9,7 +9,7 @@ import CustomSelect from './CustomSelect';
 import FormTextarea from './FormTextarea';
 import FormButtons from './FormButtons';
 import { SuccessModal } from '../ui/SuccessModal';
-import { useProductgroup, useUpdateProductgroup } from '../../hooks/useProductgroups';
+import { useProductgroup, useUpdateProductgroup, useProductGroupLevels } from '../../hooks/useProductgroups';
 import type { Productgroup } from '../../types/productgroup.dto';
 
 interface ProductGroupFormData {
@@ -33,14 +33,12 @@ const EditProductGroupForm: React.FC = () => {
 
   const { data: productGroup, isLoading: isLoadingProductGroup, error } = useProductgroup(Number(id || 0));
   const updateProductgroupMutation = useUpdateProductgroup();
+  const { data: productGroupLevels = [], isLoading: isLoadingLevels } = useProductGroupLevels();
 
-  const categoryOptions = [
-    { value: 'نوع کالا', label: 'نوع کالا' },
-    { value: 'مارک کالا', label: 'مارک کالا' },
-    { value: 'مدل کالا', label: 'مدل کالا' },
-    { value: 'دستگاه / کالا', label: 'دستگاه / کالا' },
-    { value: 'نوع قطعات', label: 'نوع قطعات' }
-  ];
+  const categoryOptions = productGroupLevels.map((level: any) => ({
+    value: level.ProductGroupLevelID?.toString() || '',
+    label: level.Title || ''
+  }));
 
   useEffect(() => {
     if (productGroup) {
@@ -173,6 +171,7 @@ const EditProductGroupForm: React.FC = () => {
                     onChange={(value) => handleInputChange('category', value)}
                     options={categoryOptions}
                     placeholder="-- لطفاً طبقه گروه بندی را انتخاب نمایید --"
+                    isLoading={isLoadingLevels}
                     required
                   />
 

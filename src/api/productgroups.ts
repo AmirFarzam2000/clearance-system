@@ -6,6 +6,10 @@ export const productgroupsApi = {
     const response = await api.get('/productgroups');
     return response.data;
   },
+  getProductGroupLevels: async () => {
+    const response = await api.get('/productgroups/GetProductGroupLevels');
+    return response.data;
+  },
   getProductgroupById: async (id: number) => {
     const response = await api.get(`/productgroups/${id}`);
     return response.data;

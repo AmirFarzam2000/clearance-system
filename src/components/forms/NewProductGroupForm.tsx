@@ -7,6 +7,9 @@ import FormInput from './FormInput';
 import CustomSelect from './CustomSelect';
 import FormTextarea from './FormTextarea';
 import FormButtons from './FormButtons';
+import { useProductGroupLevels } from '../../hooks/useProductgroups';
+import { useToast } from '../../hooks/useToast';
+import ToastContainer from '../ui/Toast';
 
 interface ProductGroupFormData {
   category: string;
@@ -18,6 +21,7 @@ interface ProductGroupFormData {
 interface NewProductGroupFormProps {
   onBack: () => void;
   onSubmit: (data: ProductGroupFormData) => void;
+  error?: any;
 }
 
 const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack, onSubmit }) => {
@@ -29,14 +33,13 @@ const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack, onSub
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const { data: productGroupLevels = [], isLoading: isLoadingLevels } = useProductGroupLevels();
+  const { toasts, removeToast, showSuccess, showError } = useToast();
 
-  const categoryOptions = [
-    { value: 'نوع کالا', label: 'نوع کالا' },
-    { value: 'مارک کالا', label: 'مارک کالا' },
-    { value: 'مدل کالا', label: 'مدل کالا' },
-    { value: 'دستگاه / کالا', label: 'دستگاه / کالا' },
-    { value: 'نوع قطعات', label: 'نوع قطعات' }
-  ];
+  const categoryOptions = productGroupLevels.map((level: any) => ({
+    value: level.ProductGroupLevelID?.toString() || '',
+    label: level.Title || ''
+  }));
 
   const handleInputChange = (field: keyof ProductGroupFormData, value: string) => {
     setFormData(prev => ({
@@ -51,6 +54,32 @@ const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack, onSub
     
     try {
       await onSubmit(formData);
+      showSuccess('موفقیت', 'گروه کالا جدید با موفقیت ثبت شد');
+    } catch (error: any) {
+      console.error('Error creating product group:', error);
+      
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        
+        if (errorData.ActionErrors && errorData.ActionErrors.length > 0) {
+          errorData.ActionErrors.forEach((errorMsg: string) => {
+            showError('خطا در ثبت گروه کالا', errorMsg);
+          });
+        } else if (errorData.ValidationErrors && errorData.ValidationErrors.length > 0) {
+          errorData.ValidationErrors.forEach((validationError: any) => {
+            const errorMessage = validationError.ErrorMessage || validationError.message || 'خطا در اعتبارسنجی';
+            showError('خطا در اعتبارسنجی', errorMessage);
+          });
+        } else if (errorData.message) {
+          showError('خطا در ثبت گروه کالا', errorData.message);
+        } else {
+          showError('خطا در ثبت گروه کالا', 'خطای غیرمنتظره‌ای رخ داده است');
+        }
+      } else if (error.message) {
+        showError('خطا در ثبت گروه کالا', error.message);
+      } else {
+        showError('خطا در ثبت گروه کالا', 'خطای غیرمنتظره‌ای رخ داده است');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -87,6 +116,7 @@ const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack, onSub
                   onChange={(value) => handleInputChange('category', value)}
                   options={categoryOptions}
                   placeholder="-- لطفاً طبقه گروه بندی را انتخاب نمایید --"
+                  isLoading={isLoadingLevels}
                   required
                 />
 
@@ -126,6 +156,8 @@ const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack, onSub
           </div>
         </div>
       </div>
+      
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </div>
   );
 };
