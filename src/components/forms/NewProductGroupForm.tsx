@@ -55,13 +55,13 @@ const NewProductGroupForm: React.FC<NewProductGroupFormProps> = ({ onBack }) => 
       );
 
       const payload = {
-        ProductGroupID: 0,
+        ProductGroupID: null,
         ProductGroupLevelID: selectedLevel?.ProductGroupLevelID || 0,
         ProductGroupLevelTitle: selectedLevel?.Title || '',
         Code: formData.code,
         Title: formData.title,
         Description: formData.description || '',
-        RowVersion: ''
+        RowVersion: []
       };
 
       await createProductgroupMutation.mutateAsync(payload);
