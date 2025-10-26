@@ -4,7 +4,7 @@ import { useState } from "react";
 function useModal<T = any>() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  const openModal = (meta?: T) => {
+  const openModal = (_meta?: T) => {
     setIsOpen(true);
   };
 
