@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import ExpandedView from './ExpandedView';
 import CollapsedView from './CollapsedView';
-import type { ExpandedItems } from './types';
+import type { ExpandedItems } from '../../../../types/types';
 
 interface RightSidebarProps {
   isOpen: boolean;
