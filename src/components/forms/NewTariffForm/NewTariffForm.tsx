@@ -17,8 +17,8 @@ import BasicFieldsSection from './BasicFieldsSection';
 import TextAreaSection from './TextAreaSection';
 import CheckboxSection from './CheckboxSection';
 import FormErrorDisplay from './FormErrorDisplay';
-import { buildPayload, mapValidationErrors } from './tariffFormUtils';
-import type { TariffFormData } from './tariffFormUtils';
+import { buildPayload, mapValidationErrors } from '../../../utils/tariffFormUtils';
+import type { TariffFormData } from '../../../utils/tariffFormUtils';
 
 interface NewTariffFormProps {
   onBack: () => void;
