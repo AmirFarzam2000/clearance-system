@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import ChevronLeftIcon from '../../../ui/icons/ChevronLeftIcon';
-import type { MenuItem } from './types';
+import type { MenuItem } from '../../../../types/types';
 
 interface HoverMenuProps {
   items: MenuItem[];
