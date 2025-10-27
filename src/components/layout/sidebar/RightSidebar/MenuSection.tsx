@@ -1,7 +1,7 @@
 import React from 'react';
 import ChevronRightIcon from '../../../ui/icons/ChevronRightIcon';
 import MenuItem from './MenuItem';
-import type { MenuItem as MenuItemType } from './types';
+import type { MenuItem as MenuItemType } from '../../../../types/types';
 
 interface MenuSectionProps {
   label: string;
