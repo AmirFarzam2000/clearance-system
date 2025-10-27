@@ -101,7 +101,7 @@ const NewProductForm: React.FC<NewProductFormProps> = ({ onBack, onSubmit }) => 
   ];
 
   return (
-    <div className="flex-1 bg-gray-50">
+    <div className="flex-1 bg-gray-50 flex flex-col overflow-auto">
       <div className="p-5">
         <div className="mx-auto max-w-full">
           <div style={{
@@ -127,35 +127,29 @@ const NewProductForm: React.FC<NewProductFormProps> = ({ onBack, onSubmit }) => 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <div className="space-y-3">
-                      <label className="block text-sm font-yekan-medium text-gray-700 text-right">
-                        تعرفه کالا :
-                      </label>
-                      
-                      <FormSelect
-                        label="سطح اول :"
-                        value={formData.tariffLevel1}
-                        onChange={(value) => handleInputChange('tariffLevel1', value)}
-                        options={tariffLevel1Options}
-                        placeholder="تعرفه سطح اول را انتخاب نمایید"
-                      />
+                    <FormSelect
+                      label="سطح اول :"
+                      value={formData.tariffLevel1}
+                      onChange={(value) => handleInputChange('tariffLevel1', value)}
+                      options={tariffLevel1Options}
+                      placeholder="تعرفه سطح اول را انتخاب نمایید"
+                    />
 
-                      <FormSelect
-                        label="سطح دوم :"
-                        value={formData.tariffLevel2}
-                        onChange={(value) => handleInputChange('tariffLevel2', value)}
-                        options={tariffLevel2Options}
-                        placeholder="تعرفه سطح دوم را انتخاب نمایید"
-                      />
+                    <FormSelect
+                      label="سطح دوم :"
+                      value={formData.tariffLevel2}
+                      onChange={(value) => handleInputChange('tariffLevel2', value)}
+                      options={tariffLevel2Options}
+                      placeholder="تعرفه سطح دوم را انتخاب نمایید"
+                    />
 
-                      <FormSelect
-                        label="سطح سوم :"
-                        value={formData.tariffLevel3}
-                        onChange={(value) => handleInputChange('tariffLevel3', value)}
-                        options={tariffLevel3Options}
-                        placeholder="تعرفه سطح سوم را انتخاب نمایید"
-                      />
-                    </div>
+                    <FormSelect
+                      label="سطح سوم :"
+                      value={formData.tariffLevel3}
+                      onChange={(value) => handleInputChange('tariffLevel3', value)}
+                      options={tariffLevel3Options}
+                      placeholder="تعرفه سطح سوم را انتخاب نمایید"
+                    />
 
                     <FormInput
                       label="نام گمرکی کالا :"
