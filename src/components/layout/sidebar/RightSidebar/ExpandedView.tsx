@@ -7,9 +7,9 @@ import LogoutIcon from '../../../ui/icons/LogoutIcon';
 import MenuSection from './MenuSection';
 import SidebarHeader from './SidebarHeader';
 import UserProfile from './UserProfile';
-import { BASIC_INFO_ITEMS, SYSTEM_AFFAIRS_ITEMS } from './constants';
+import { BASIC_INFO_ITEMS, SYSTEM_AFFAIRS_ITEMS } from '../../../../utils/constants';
 import { authApi } from '../../../../api/auth.api';
-import type { ExpandedItems } from './types';
+import type { ExpandedItems } from '../../../../types/types';
 
 interface ExpandedViewProps {
   onToggle: () => void;
