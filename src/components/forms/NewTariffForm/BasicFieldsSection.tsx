@@ -11,7 +11,7 @@ interface BasicFieldsSectionProps {
 const BasicFieldsSection: React.FC<BasicFieldsSectionProps> = ({ control, errors }) => {
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1  gap-4">
         <Controller
           name="customsDuties"
           control={control}
@@ -51,7 +51,7 @@ const BasicFieldsSection: React.FC<BasicFieldsSectionProps> = ({ control, errors
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1  gap-4">
         <Controller
           name="tariffNumber"
           control={control}
