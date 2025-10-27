@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import ChevronLeftIcon from '../../../ui/icons/ChevronLeftIcon';
-import type { MenuItem as MenuItemType } from './types';
+import type { MenuItem as MenuItemType } from '../../../../types/types';
 
 interface MenuItemProps {
   item: MenuItemType;
