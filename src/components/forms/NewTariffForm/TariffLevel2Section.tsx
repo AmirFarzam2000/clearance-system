@@ -28,7 +28,7 @@ const TariffLevel2Section: React.FC<TariffLevel2SectionProps> = ({
   onAddNew
 }) => {
   return (
-    <div className="flex items-end gap-4">
+    <div className="flex items-center gap-4">
       <div className="flex-1">
         <Controller
           name="tariffLevel2"
