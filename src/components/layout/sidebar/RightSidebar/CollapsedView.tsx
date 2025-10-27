@@ -7,7 +7,7 @@ import ClockIcon from '../../../ui/icons/ClockIcon';
 import ClipboardIcon from '../../../ui/icons/ClipboardIcon';
 import LogoutIcon from '../../../ui/icons/LogoutIcon';
 import HoverMenu from './HoverMenu';
-import { BASIC_INFO_ITEMS, SYSTEM_AFFAIRS_ITEMS, PERSONAL_TASKS_ITEMS } from './constants';
+import { BASIC_INFO_ITEMS, SYSTEM_AFFAIRS_ITEMS, PERSONAL_TASKS_ITEMS } from '../../../../utils/constants';
 import { authApi } from '../../../../api/auth.api';
 
 interface CollapsedViewProps {
