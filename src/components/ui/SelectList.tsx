@@ -101,7 +101,7 @@ const SelectList: React.FC<SelectListProps> = ({
   }, [highlightedIndex, isOpen]);
 
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <div ref={containerRef}  className={`relative  ${className}`}>
       <div
         onClick={handleToggle}
         onKeyDown={handleKeyDown}
