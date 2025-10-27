@@ -160,15 +160,15 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
   }));
 
   return (
-    <div className="flex-1 bg-gray-50 flex flex-col">
-      <div className="p-5 flex-1 flex flex-col">
-        <div className=" max-w-full flex-1 flex flex-col">
+    <div className="flex-1 bg-gray-50 flex flex-col overflow-auto">
+      <div className="p-5 flex-1">
+        <div className=" max-w-full">
           <div style={{
             borderRadius: '10px',
             background: '#f5f5f5',
             border: '5px solid #fff',
             boxShadow: '0 0 16px #292a330f, 0 6px 20px #292a3305'
-          }} className="p-3 md:p-5 lg:p-[20px] flex-1 flex flex-col">
+          }} className="p-3 md:p-5 lg:p-[20px]">
 
             <PageHeader 
               title="تعرفه جدید" 
@@ -182,11 +182,11 @@ const NewTariffForm: React.FC<NewTariffFormProps> = ({ onBack }) => {
               onSearch={() => {}}
             />
             
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6 flex-1 flex flex-col">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
               <FormErrorDisplay error={createTarrifL3Mutation.error} />
 
-              <form onSubmit={handleSubmit(handleFormSubmit)} className="flex-1 flex flex-col">
-                <div className="flex-1 overflow-y-auto space-y-4 pr-2" style={{ maxHeight: 'calc(100vh - 300px)' }}>
+              <form onSubmit={handleSubmit(handleFormSubmit)}>
+                <div className="space-y-4">
                   <TariffLevel1Section
                     control={control}
                     errors={errors}
