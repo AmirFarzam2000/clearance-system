@@ -6,6 +6,8 @@ import Table from '../ui/Table';
 import HomeIcon from '../ui/icons/HomeIcon';
 import { ConfirmModal } from '../ui/Modal';
 import { useCurrencies, useDeleteCurrency } from '../../hooks/useCurrencies';
+import { useToast } from '../../hooks/useToast';
+import ToastContainer from '../ui/Toast';
 
 const CurrencyManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -20,6 +22,7 @@ const CurrencyManagement: React.FC = () => {
   
   const { data: currencies = [], isLoading, error, refetch } = useCurrencies();
   const deleteCurrencyMutation = useDeleteCurrency();
+  const { toasts, removeToast, showSuccess, showError } = useToast();
 
   const columns = [
     { key: 'actions', title: 'عملیات', width: 120 },
@@ -44,16 +47,53 @@ const CurrencyManagement: React.FC = () => {
     });
   };
 
-  const handleConfirmDelete = () => {
-    if (deleteModal.currency) {
-      deleteCurrencyMutation.mutate(deleteModal.currency.CurrencyID, {
-        onSuccess: () => {
-          setDeleteModal({ isOpen: false, currency: null });
-        },
-        onError: () => {
-          setDeleteModal({ isOpen: false, currency: null });
+  const handleConfirmDelete = async () => {
+    if (!deleteModal.currency) return;
+    
+    try {
+      await deleteCurrencyMutation.mutateAsync(deleteModal.currency.CurrencyID);
+      showSuccess('موفقیت', 'ارز با موفقیت حذف شد');
+      setDeleteModal({ isOpen: false, currency: null });
+      refetch();
+    } catch (error: any) {
+      console.error('Error deleting currency:', error);
+      console.error('Error response data:', error?.response?.data);
+      
+      // Show error messages in toast
+      if (error?.response?.data) {
+        const errorData = error.response.data;
+        console.log('Error data:', errorData);
+        
+        if (errorData.ActionErrors && errorData.ActionErrors.length > 0) {
+          console.log('Showing ActionErrors toast:', errorData.ActionErrors);
+          errorData.ActionErrors.forEach((errorMsg: string) => {
+            console.log('Showing error toast:', errorMsg);
+            showError('خطا در حذف ارز', errorMsg);
+          });
+        } else if (errorData.ValidationErrors && errorData.ValidationErrors.length > 0) {
+          console.log('Showing ValidationErrors toast:', errorData.ValidationErrors);
+          errorData.ValidationErrors.forEach((validationError: any) => {
+            const errorMessage = validationError.ErrorMessage || validationError.message || 'خطا در اعتبارسنجی';
+            console.log('Showing validation error toast:', errorMessage);
+            showError('خطا در اعتبارسنجی', errorMessage);
+          });
+        } else if (errorData.message) {
+          console.log('Showing error message toast:', errorData.message);
+          showError('خطا در حذف ارز', errorData.message);
+        } else {
+          console.log('Showing generic error toast');
+          showError('خطا در حذف ارز', 'خطای غیرمنتظره‌ای رخ داده است');
         }
-      });
+      } else if (error.message) {
+        console.log('Showing error.message toast:', error.message);
+        showError('خطا در حذف ارز', error.message);
+      } else {
+        console.log('Showing final generic error toast');
+        showError('خطا در حذف ارز', 'خطای غیرمنتظره‌ای رخ داده است');
+      }
+      
+      // Close the modal after showing error
+      setDeleteModal({ isOpen: false, currency: null });
     }
   };
 
@@ -179,6 +219,8 @@ const CurrencyManagement: React.FC = () => {
         confirmButtonColor="red"
         isLoading={deleteCurrencyMutation.isPending}
       />
+      
+      <ToastContainer toasts={toasts} onRemove={removeToast} />
     </>
   );
 };
